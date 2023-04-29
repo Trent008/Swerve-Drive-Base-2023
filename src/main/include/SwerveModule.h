@@ -1,8 +1,11 @@
 #pragma once
 #include "utilities.h"
 #include "ctre/phoenix.h"
+#include "ctre/phoenixpro/TalonFX.hpp"
 #include "rev/CANSparkMax.h"
+
 using namespace math;
+using namespace ctre::phoenixpro;
 
 class SwerveModule
 {
@@ -15,20 +18,23 @@ private:
     double steeringMotorP; // proportional value determines how quickly the steering responds to angle setpoints
     double lastPosition = 0;
     double currentPosition;
-    WPI_TalonFX *driveMotor;
+    hardware::TalonFX *driveMotor;
+    controls::PositionTorqueCurrentFOC *driveMotorOut;
     rev::CANSparkMax *steeringMotor;
     CANCoder *wheelEncoder;
     Vector wheelPositionChange;
+    units::angle::turn_t rotations = 0_tr;
 
 public:
     /**
      * parameters posX and posY set the position of
      * the module relative to the center of the robot
      */
-    SwerveModule(WPI_TalonFX *driveMotor, rev::CANSparkMax *steeringMotor, CANCoder *wheelEncoder, Vector position = {})
+    SwerveModule(hardware::TalonFX *driveMotor, controls::PositionTorqueCurrentFOC *driveMotorOut, rev::CANSparkMax *steeringMotor, CANCoder *wheelEncoder, Vector position = {})
     {
         steeringMotorP = 1;
         this->driveMotor = driveMotor;
+        this->driveMotorOut = driveMotorOut;
         this->steeringMotor = steeringMotor;
         this->wheelEncoder = wheelEncoder;
         turnVector = position;
@@ -55,9 +61,10 @@ public:
             wheelDirection = -1;
         }
         wheelSpeed = abs(moduleVelocity) * wheelDirection;
-        driveMotor->Set(wheelSpeed);
+        rotations += wheelSpeed * 2.3_tr;
+        driveMotor->SetControl(driveMotorOut->WithPosition(rotations));
         steeringMotor->Set(double(error) * -steeringMotorP / 180);
-        currentPosition = driveMotor->GetSelectedSensorPosition(0);
+        currentPosition = driveMotor->GetPosition().GetValue().value();
         wheelPositionChange = Vector{0, currentPosition - lastPosition};
         wheelPositionChange.rotateCW(wheelEncoder->GetAbsolutePosition());
         lastPosition = currentPosition;

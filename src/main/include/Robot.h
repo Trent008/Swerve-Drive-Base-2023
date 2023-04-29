@@ -16,10 +16,15 @@ public:
 
 
   /* -------- swerve drive motors -------- */
-  WPI_TalonFX driveMotor1{11};
-  WPI_TalonFX driveMotor2{12};
-  WPI_TalonFX driveMotor3{13};
-  WPI_TalonFX driveMotor4{14};
+  hardware::TalonFX drive_m1{11, "rio"};
+  hardware::TalonFX drive_m2{12, "rio"};
+  hardware::TalonFX drive_m3{13, "rio"};
+  hardware::TalonFX drive_m4{14, "rio"};
+  controls::PositionTorqueCurrentFOC drive_m1_ctrl{0_tr, 0_A, 0, false};
+  controls::PositionTorqueCurrentFOC drive_m2_ctrl{0_tr, 0_A, 0, false};
+  controls::PositionTorqueCurrentFOC drive_m3_ctrl{0_tr, 0_A, 0, false};
+  controls::PositionTorqueCurrentFOC drive_m4_ctrl{0_tr, 0_A, 0, false};
+
   /* -------- swerve module encoders -------- */
   CANCoder encoder1{21};
   CANCoder encoder2{22};
@@ -34,10 +39,10 @@ public:
   // swerve module array:
   SwerveModule moduleArray[4] =
   {
-    {&driveMotor1, &steeringMotor1, &encoder1, {-17.75, 25}},
-    {&driveMotor2, &steeringMotor2, &encoder2, {-17.75, -25}},
-    {&driveMotor3, &steeringMotor3, &encoder3, {17.75, 25}},
-    {&driveMotor4, &steeringMotor4, &encoder4, {17.75, -25}}
+    {&drive_m1, &drive_m1_ctrl, &steeringMotor1, &encoder1, {-17.75, 25}},
+    {&drive_m2, &drive_m2_ctrl, &steeringMotor2, &encoder2, {-17.75, -25}},
+    {&drive_m3, &drive_m3_ctrl, &steeringMotor3, &encoder3, {17.75, 25}},
+    {&drive_m4, &drive_m4_ctrl, &steeringMotor4, &encoder4, {17.75, -25}}
   };
 
   // swerve drive object to control the 4-SwerveModule array using the motion controller object

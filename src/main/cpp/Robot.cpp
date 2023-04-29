@@ -4,20 +4,28 @@
 void Robot::RobotInit()
 {
     // swerve motor config
-    driveMotor1.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor, 0, 20);
-    driveMotor2.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor, 0, 20);
-    driveMotor3.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor, 0, 20);
-    driveMotor4.ConfigSelectedFeedbackSensor(FeedbackDevice::IntegratedSensor, 0, 20);
+    
 }
 
 void Robot::RobotPeriodic(){}
 
 void Robot::AutonomousInit()
 {
-  driveMotor1.SetSelectedSensorPosition(0);
-  driveMotor2.SetSelectedSensorPosition(0);
-  driveMotor3.SetSelectedSensorPosition(0);
-  driveMotor4.SetSelectedSensorPosition(0);
+  configs::TalonFXConfiguration configs{};
+  configs.Slot0.kP = 40; // An error of 1 rotations results in 40 amps output
+  configs.Slot0.kD = 2; // A change of 1 rotation per second results in 2 amps output
+
+  configs.TorqueCurrent.PeakForwardTorqueCurrent = 130;  // Peak output of 130 amps
+  configs.TorqueCurrent.PeakReverseTorqueCurrent = -130; // Peak output of 130 amps
+  drive_m1.GetConfigurator().Apply(configs);
+  drive_m1.SetRotorPosition(0_tr);
+  drive_m2.GetConfigurator().Apply(configs);
+  drive_m2.SetRotorPosition(0_tr);
+  drive_m3.GetConfigurator().Apply(configs);
+  drive_m3.SetRotorPosition(0_tr);
+  drive_m4.GetConfigurator().Apply(configs);
+  drive_m4.SetRotorPosition(0_tr);
+
   swerve.zeroYaw();
 }
 
