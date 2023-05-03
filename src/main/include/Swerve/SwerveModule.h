@@ -1,5 +1,5 @@
 #pragma once
-#include "translation2D/Pose.h"
+#include "translations2D/Pose.h"
 #include "ctre/phoenix.h"
 #include "ctre/phoenixpro/TalonFX.hpp"
 #include "rev/CANSparkMax.h"

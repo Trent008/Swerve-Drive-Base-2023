@@ -1,5 +1,5 @@
 #pragma once
-#include "translation2D/Pose.h"
+#include "translations2D/Pose.h"
 #include "Parameters.h"
 
 // stores variables needed to drive to a pose on the field
