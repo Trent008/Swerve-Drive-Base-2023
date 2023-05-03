@@ -19,8 +19,8 @@ private:
         {14, 34, 24, {17.75, -25}}
     };
 
-    Pose robotRate;
-    Pose fieldRate;
+    Pose robotRate; // stores the target robot-centric drive rate then the actual robot-cnetric drive rate
+    Pose fieldRate; // field-centric rate after acceleration
     double moduleWheelSpeed;         // stores the velocity of each module in turn
     double fastestModule;            // fastest module velocity to be limited to 1
     Vector averagePositionChange;    // average module position change
@@ -60,7 +60,7 @@ public:
             averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
         }
         averagePositionChange.divide(4); // find the average position change
-        averagePositionChange.scale(1 / 6.75 / 2048 * M_PI * 3.9); // convert to inches
+        averagePositionChange.scale(parameters.driveMotorRotationsToInches); // find the average and convert to inches
         fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
     }
 
