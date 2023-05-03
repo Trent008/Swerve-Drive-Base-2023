@@ -1,12 +1,12 @@
 #pragma once
 #include "SwerveDrive.h"
-#include "SwerveSetpoint.h"
+#include "SwervePreset.h"
 
 /**
  * allows the swerve drive to autonomously drive
  * to an array of current positions and angles
  **/
-class SwervePoseTargeting
+class SwervePoseController
 {
 private:
     double positionProportional = 0.023; // rate at which to approach the current position
@@ -16,22 +16,22 @@ private:
     SwerveDrive *swerve;
 
 public:
-    SwervePoseTargeting(SwerveDrive *swerve)
-    {   
+    SwervePoseController(SwerveDrive *swerve)
+    {
         this->swerve = swerve;
     }
 
-    void targetPose(SwerveModule moduleArray[4], SwerveSetpoint swerveSetpoint)
+    void setReferencePose(SwervePreset setpoint)
     {   
-        poseError = swerveSetpoint.targetPose - swerve->getFieldPose();
+        poseError = setpoint.targetPose - swerve->getFieldPose();
         swerveRate = poseError;
         swerveRate *= Vector{positionProportional, angleProportional};
-        swerveRate.limit(swerveSetpoint.driveRate, swerveSetpoint.rotationRate);
-        swerve->Set(moduleArray, swerveRate);
+        swerveRate.limit(setpoint.maxDriveRate, setpoint.maxRotationRate);
+        swerve->Set(swerveRate);
     }
 
     bool poseReached(double positionTolerance, double angleTolerance)
     {
-        return (abs(poseError.getVector()) < positionTolerance) && (abs(poseError.getAngle()) < angleTolerance);
+        return (abs(poseError.vector) < positionTolerance) && (abs(poseError.angle) < angleTolerance);
     }
 };

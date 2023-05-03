@@ -1,7 +1,6 @@
 #pragma once
 #include "frc/Joystick.h"
-#include "utilities.h"
-using namespace math;
+#include "translation2D/Pose.h"
 
 class XBOXController
 {
@@ -129,7 +128,7 @@ public:
         return Pose{Vector{getLX(), getLY()}, getRX()};
     }
 
-    bool zero()
+    bool abxyAllTrue()
     {
         return joy->GetRawButton(1) && joy->GetRawButton(2) && joy->GetRawButton(3) && joy->GetRawButton(4);
     }
