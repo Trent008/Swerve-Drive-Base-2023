@@ -36,7 +36,7 @@ public:
     void Set(Pose driveRate)
     {
         navXAngle = Angle{navx.GetYaw()};
-        fieldAngle = navXAngle + parameters.startingAngle;
+        fieldAngle = navXAngle.getAdded(parameters.startingAngle);
 
         robotRate = driveRate.getRotatedCCW(fieldAngle.value); // robot orient the drive rate
 
@@ -49,7 +49,7 @@ public:
                 fastestModule = moduleWheelSpeed;
             }
         }
-        driveRate /= fastestModule;                         // limit the drive rate to keep all velocities below 1
+        driveRate.divide(fastestModule);                         // limit the drive rate to keep all velocities below 1
         fieldRate.moveToward(driveRate, parameters.robotAccel); // accelerate toward the drive rate target
         robotRate = fieldRate.getRotatedCCW(fieldAngle.value);    // robot orient the drive rate
 
@@ -57,11 +57,11 @@ public:
         for (int i = 0; i < 4; i++)       // loop through the module indexes again
         {
             modules[i].Set(robotRate);                                                            // set each module using the accelerated robot rate
-            averagePositionChange += modules[i].getwheelPositionChange().getRotatedCW(fieldAngle.value); // add the wheel velocity to the total sum
+            averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
         }
-        averagePositionChange /= 4; // find the average position change
-        averagePositionChange *= 1 / 6.75 / 2048 * M_PI * 3.9;
-        fieldDisplacement += averagePositionChange; // adds the distance traveled this cycle to the total distance to find the position
+        averagePositionChange.divide(4); // find the average position change
+        averagePositionChange.scale(1 / 6.75 / 2048 * M_PI * 3.9); // convert to inches
+        fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
     }
 
     void initialize()

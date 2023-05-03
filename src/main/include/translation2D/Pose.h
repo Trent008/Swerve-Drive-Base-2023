@@ -19,38 +19,32 @@ public:
         this->angle = angle;
     }
 
-    Pose operator+(Pose obj)
+    Pose getAdded(Pose const &obj)
     {
-        return Pose{vector + obj.vector, angle + obj.angle};
+        Pose res = *this;
+        res.vector.add(obj.vector);
+        res.angle.add(obj.angle);
+        return res;
     }
 
-    void operator+=(Pose obj)
+    Pose getDifference(Pose const &obj)
     {
-        vector += obj.vector;
-        angle += obj.angle;
+        Pose res = *this;
+        res.vector.subtract(obj.vector);
+        res.angle.subtract(obj.angle);
+        return res;
     }
 
-    Pose operator-(Pose obj)
+    void scale(double kPositional, double kAngular)
     {
-        return Pose{vector - obj.vector, angle - obj.angle};
+        vector.scale(kPositional);
+        angle.scale(kAngular);
     }
 
-    void operator-=(Pose pose)
+    void divide(double k)
     {
-        vector -= pose.vector;
-        angle -= pose.angle;
-    }
-
-    void operator*=(Vector obj)
-    {
-        vector *= obj.x;
-        angle *= obj.y;
-    }
-
-    void operator/=(double k)
-    {
-        vector /= k;
-        angle /= k;
+        vector.divide(k);
+        angle.divide(k);
     }
 
     void moveToward(Pose pose, double rate)
@@ -63,21 +57,21 @@ public:
     {
         if (abs(vector) > vectorLimit)
         {
-            vector *= vectorLimit / abs(vector);
+            vector.scale(vectorLimit / abs(vector));
         }
         if (abs(angle) > angleLimit)
         {
-            angle *= angleLimit / abs(angle);
+            angle.scale(angleLimit / abs(angle));
         }
     }
 
     Pose getRotatedCW(double angle)
     {
-        return Pose{vector.getRotatedCW(angle), this->angle};
+        return Pose{vector.rotateCW(angle), this->angle};
     }
 
     Pose getRotatedCCW(double angle)
     {
-        return Pose{vector.getRotatedCCW(angle), this->angle};
+        return Pose{vector.rotateCCW(angle), this->angle};
     }
 };

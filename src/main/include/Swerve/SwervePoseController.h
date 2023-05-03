@@ -23,9 +23,9 @@ public:
 
     void setReferencePose(SwervePreset setpoint)
     {   
-        poseError = setpoint.targetPose - swerve->getFieldPose();
+        poseError = setpoint.targetPose.getDifference(swerve->getFieldPose());
         swerveRate = poseError;
-        swerveRate *= Vector{positionProportional, angleProportional};
+        swerveRate.scale(positionProportional, angleProportional);
         swerveRate.limit(setpoint.maxDriveRate, setpoint.maxRotationRate);
         swerve->Set(swerveRate);
     }

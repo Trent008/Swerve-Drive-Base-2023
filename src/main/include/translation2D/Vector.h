@@ -22,62 +22,36 @@ public:
         this->y = y;
     }
 
-    // return Vector{(left side).x + (right side).x, (left side).y + (right side).y}
-    Vector operator+(Vector const &obj)
-    {
-        return Vector{x + obj.x, y + obj.y};
-    }
-
-    // return Vector{(left side).x - (right side).x, (left side).y - (right side).y}
-    Vector operator-(Vector const &obj)
-    {
-        return Vector{x - obj.x, y - obj.y};
-    }
-
-    /**
-     * (left side).x += (right side).x
-     * (left side).y += (right side).y
-    */
-    void operator+=(Vector const &obj)
+    // add another vector to this vector and return the result
+    Vector add(Vector const &obj)
     {
         x += obj.x;
         y += obj.y;
+        return *this;
     }
 
-    /**
-     * (left side).x -= (right side).x
-     * (left side).y -= (right side).y
-    */
-    void operator-=(Vector const &obj)
+    // subtract another vector from this vector and return the result
+    Vector subtract(Vector const &obj)
     {
         x -= obj.x;
         y -= obj.y;
+        return *this;
     }
 
-    // return Vector (left side) * double (right side)
-    Vector operator*(double const &k)
-    {
-        return Vector{x * k, y * k};
-    }
-
-    // return Vector (left side) / double (right side)
-    Vector operator/(double const &k)
-    {
-        return Vector{x / k, y / k};
-    }
-
-    // Vector (left side) *= double (right side)
-    void operator*=(double const &k)
+    // return this vector after scaling by the given constant
+    Vector scale(double const &k)
     {
         x *= k;
         y *= k;
+        return *this;
     }
 
-    // Vector (left side) /= double (right side)
-    void operator/=(double const &k)
+    // return this vector after dividing by the given constant
+    Vector divide(double const &k)
     {
         x /= k;
         y /= k;
+        return *this;
     }
 
     // return this vector's angle (-180 to 180 degrees)
@@ -95,41 +69,31 @@ public:
     // move this vector toward another vector's value by the specified increment
     void moveToward(Vector target, double increment)
     {
-        target -= *this;
+        target.subtract(*this);
         if (target.getMagnitude() > 2 * increment)
         {
-            *this += target / target.getMagnitude() * increment;
+            this->add(target.divide(target.getMagnitude()).scale(increment));
         }
         else
         {
-            *this += target / 2.0;
+            this->add(target.divide(2.0));
         }
     }
 
     // rotate this vector clockwise by the given angle
-    void rotateCW(double angle)
+    Vector rotateCW(double angle)
     {
-        *this = this->getRotatedCW(angle);
+        angle *= M_PI / 180;
+        *this = Vector{x * cos(angle) + y * sin(angle), y * cos(angle) - x * sin(angle)};
+        return *this;
     }
 
     // rotate this vector counter-clockwise by the given angle
-    void rotateCCW(double angle)
-    {
-        *this = this->getRotatedCCW(angle);
-    }
-
-    // return this vector rotated clockwise by the given angle
-    Vector getRotatedCW(double angle)
+    Vector rotateCCW(double angle)
     {
         angle *= M_PI / 180;
-        return Vector{x * cos(angle) + y * sin(angle), y * cos(angle) - x * sin(angle)};
-    }
-
-    // return this vector rotated counter-clockwise by the given angle
-    Vector getRotatedCCW(double angle)
-    {
-        angle *= M_PI / 180;
-        return Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
+        *this = Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
+        return *this;
     }
 };
 

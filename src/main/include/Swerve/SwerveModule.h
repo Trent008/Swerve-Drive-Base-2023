@@ -41,8 +41,7 @@ public:
         wheelEncoder = new CANCoder(wheelEncoderID);
 
         turnVector = position;
-        turnVector /= abs(turnVector);
-        turnVector.rotateCW(90);
+        turnVector.divide(abs(turnVector)).rotateCW(90);
     }
 
     void initialize()
@@ -70,20 +69,20 @@ public:
 
     Vector getModuleVector(Pose robotRate)
     {
-        return robotRate.vector + turnVector * robotRate.angle.value;
+        return robotRate.vector.add(turnVector.scale(robotRate.angle.value));
     }
 
     void Set(Pose robotRate)
     {
         moduleVelocity = getModuleVector(robotRate);
         targetAngle = moduleVelocity.getAngle();
-        if (abs(targetAngle - Angle{wheelEncoder->GetAbsolutePosition()}) < 90) {
+        if (abs(targetAngle.getSubtracted(wheelEncoder->GetAbsolutePosition())) < 90) {
             driveRotations += abs(moduleVelocity) * 2.3_tr; // scale position change rate so velociy hits max
         }
         else
         {   
             driveRotations -= abs(moduleVelocity) * 2.3_tr; // scale position change rate so velociy hits max
-            targetAngle += Angle{180};
+            targetAngle.add(180);
         }
         driveMotor->SetControl(driveMotorCTRL.WithPosition(driveRotations));
         steeringPID->SetReference(targetAngle.value, rev::CANSparkMax::ControlType::kPosition);
