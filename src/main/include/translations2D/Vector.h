@@ -46,6 +46,11 @@ public:
         return *this;
     }
 
+    Vector getScaled(double const &k)
+    {
+        return Vector{x*k, y*k};
+    }
+
     // return this vector after dividing by the given constant
     Vector divide(double const &k)
     {
@@ -74,9 +79,14 @@ public:
         {
             this->add(target.divide(target.getMagnitude()).scale(increment));
         }
-        else
+        else if (target.getMagnitude() > .005)
         {
             this->add(target.divide(2.0));
+        }
+        else
+        {
+            x = 0;
+            y = 0;
         }
     }
 

@@ -33,8 +33,7 @@ public:
   XBOXController xboxC{new frc::Joystick{0}};
 
   // swerve drive object to control the 4-SwerveModule array
-  SwerveDrive swerve;
-  SwervePoseController swerveController{&swerve};
+  //SwervePoseController swerveController{&swerve};
 
   
   void RobotInit() override;

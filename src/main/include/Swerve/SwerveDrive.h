@@ -7,16 +7,16 @@
  * creates a swerve drive object that controls
  * an array of swerve drive modules
  * */
-class SwerveDrive
+class final
 {
 private:
     // module array
     SwerveModule modules[4] =
     {
-        {11, 31, 21, {-17.75, 25}},
-        {12, 32, 22, {-17.75, -25}},
-        {13, 33, 23, {17.75, 25}},
-        {14, 34, 24, {17.75, -25}}
+        SwerveModule{11, 31, 21, {-17.75, 25}},
+        SwerveModule{12, 32, 22, {-17.75, -25}},
+        SwerveModule{13, 33, 23, {17.75, 25}},
+        SwerveModule{14, 34, 24, {17.75, -25}}
     };
 
     Pose robotRate; // stores the target robot-centric drive rate then the actual robot-cnetric drive rate
@@ -50,18 +50,18 @@ public:
             }
         }
         driveRate.divide(fastestModule);                         // limit the drive rate to keep all velocities below 1
-        fieldRate.moveToward(driveRate, parameters.robotAccel); // accelerate toward the drive rate target
+        fieldRate.moveToward(driveRate, parameters.robotPercentChangePerCycle); // accelerate toward the drive rate target
         robotRate = fieldRate.getRotatedCCW(fieldAngle.value);    // robot orient the drive rate
 
-        averagePositionChange = Vector{}; // reset the average to zero before averaging again
+        // averagePositionChange = Vector{}; // reset the average to zero before averaging again
         for (int i = 0; i < 4; i++)       // loop through the module indexes again
         {
             modules[i].Set(robotRate);                                                            // set each module using the accelerated robot rate
-            averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
+            // averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
         }
-        averagePositionChange.divide(4); // find the average position change
-        averagePositionChange.scale(parameters.driveMotorRotationsToInches); // find the average and convert to inches
-        fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
+        // averagePositionChange.divide(4); // find the average position change
+        // averagePositionChange.scale(parameters.driveMotorRotationsToInches); // find the average and convert to inches
+        // fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
     }
 
     void initialize()
@@ -82,4 +82,4 @@ public:
     {
         return Pose{fieldDisplacement, fieldAngle};
     }
-};
+} swerve;

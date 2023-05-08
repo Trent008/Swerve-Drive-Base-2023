@@ -13,21 +13,16 @@ private:
     double angleProportional = 0.007;    // rate at which to approach the current angle
     Pose poseError;              // how fast the robot needs to move to get to its next position setpoint
     Pose swerveRate;
-    SwerveDrive *swerve;
 
 public:
-    SwervePoseController(SwerveDrive *swerve)
-    {
-        this->swerve = swerve;
-    }
 
     void setReferencePose(SwervePreset setpoint)
     {   
-        poseError = setpoint.targetPose.getDifference(swerve->getFieldPose());
+        poseError = setpoint.targetPose.getDifference(swerve.getFieldPose());
         swerveRate = poseError;
         swerveRate.scale(positionProportional, angleProportional);
         swerveRate.limit(setpoint.maxDriveRate, setpoint.maxRotationRate);
-        swerve->Set(swerveRate);
+        swerve.Set(swerveRate);
     }
 
     bool poseReached(double positionTolerance, double angleTolerance)
