@@ -72,6 +72,6 @@ public:
 
     Pose getRotatedCCW(double angle)
     {
-        return Pose{vector.rotateCCW(angle), this->angle};
+        return Pose{vector.getRotatedCCW(angle), this->angle};
     }
 };

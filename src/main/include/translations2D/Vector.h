@@ -79,14 +79,9 @@ public:
         {
             this->add(target.divide(target.getMagnitude()).scale(increment));
         }
-        else if (target.getMagnitude() > .005)
+        else// if (target.getMagnitude() > .005)
         {
             this->add(target.divide(2.0));
-        }
-        else
-        {
-            x = 0;
-            y = 0;
         }
     }
 
@@ -104,6 +99,12 @@ public:
         angle *= M_PI / 180;
         *this = Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
         return *this;
+    }
+
+    Vector getRotatedCCW(double angle)
+    {
+        angle *= M_PI / 180;
+        return Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
     }
 };
 

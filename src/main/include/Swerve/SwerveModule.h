@@ -1,5 +1,4 @@
 #pragma once
-#include "translations2D/Pose.h"
 #include "ctre/phoenix.h"
 #include "ctre/phoenixpro/TalonFX.hpp"
 #include "rev/CANSparkMax.h"
@@ -15,10 +14,11 @@ private:
     Vector driveRate;
     Angle steeringRate;
     Angle error;
+    double wheelAngle;
     double lastPosition = 0;
     double currentPosition;
     hardware::TalonFX *driveMotor;
-    controls::VelocityTorqueCurrentFOC driveMotorCTRL{0_tr, 0_A, 0, false};
+    controls::VelocityTorqueCurrentFOC driveMotorCTRL{0_tps, 0_A, 1, false};
     rev::CANSparkMax *steeringMotor;
     CANCoder *wheelEncoder;
     Vector wheelPositionChange;
@@ -54,7 +54,6 @@ public:
         driveMotor->GetConfigurator().Apply(configs);
         driveMotor->SetRotorPosition(0_tr);
 
-        steeringMotor->RestoreFactoryDefaults();
         steeringMotor->SetInverted(true);
         //steeringPID->SetP(0.1);
         //steeringPID->SetI(1e-4);
@@ -76,28 +75,35 @@ public:
 
     void Set(Pose robotRate)
     {
+        wheelAngle = wheelEncoder->GetAbsolutePosition();
         moduleVelocity = getModuleVector(robotRate);
-        error = Angle{moduleVelocity.getAngle()}.getSubtracted(wheelEncoder->GetAbsolutePosition());
+        error = Angle{moduleVelocity.getAngle()}.getSubtracted(wheelAngle);
         auto frictionTorque = 1_A;
-        auto driveRate = abs(moduleVelocity) * parameters.falconMaxRotationsPerSecond;
+        double rotationRate = abs(moduleVelocity) * parameters.falconMaxRotationsPerSecond;
         if (abs(error) > 90)
         {
             frictionTorque = -frictionTorque;
-            driveRate = -driveRate;
+            rotationRate = -rotationRate;
+            error.add(180);
         }
-        driveMotor->SetControl(driveMotorCTRL.WithVelocity(driveRate).WithFeedForward(frictionTorque));
+        driveMotor->SetControl(driveMotorCTRL.WithVelocity(rotationRate * 1_tps).WithFeedForward(frictionTorque));
         
         steeringMotor->Set(error.value / 180);
-        // steeringPID->SetReference(targetAngle.value, rev::CANSparkMax::ControlType::kPosition);
-
+    
         currentPosition = driveMotor->GetPosition().GetValue().value();
         wheelPositionChange = Vector{0, currentPosition - lastPosition};
-        wheelPositionChange.rotateCW(wheelEncoder->GetAbsolutePosition());
+        wheelPositionChange.rotateCW(wheelAngle);
         lastPosition = currentPosition;
     }
 
     Vector getwheelPositionChange()
     {
         return wheelPositionChange;
+    }
+
+    Vector getWheelVelocity() {
+        Vector res{0, driveMotor->GetVelocity().GetValue().value()};
+        res.rotateCW(wheelAngle);
+        return res;
     }
 };

@@ -87,14 +87,10 @@ public:
             target.scale(rate);
             this->add(target);
         }
-        else if (std::abs(target.value) > .005)
+        else // if (std::abs(target.value) > .005)
         {
             target.divide(2);
             this->add(target);
-        }
-        else
-        {
-            value = 0;
         }
     }
 };
