@@ -21,6 +21,7 @@ private:
 
     Pose robotRate; // stores the target robot-centric drive rate then the actual robot-cnetric drive rate
     Pose fieldRate; // field-centric rate after acceleration
+    Pose fieldAccelCommand;
     double moduleWheelSpeed;         // stores the velocity of each module in turn
     double fastestModule;            // fastest module velocity to be limited to 1
     Vector averagePositionChange;    // average module position change
@@ -38,7 +39,7 @@ public:
         navXAngle = Angle{navx.GetYaw()};
         fieldAngle = navXAngle.getAdded(parameters.startingAngle);
 
-        robotRate = driveRate.getRotatedCCW(fieldAngle.value); // robot orient the drive rate
+        robotRate = driveRate.getRotatedCW(-fieldAngle.value); // robot orient the drive rate
 
         fastestModule = 1;
         for (int i = 0; i < 4; i++) // compare all of the module velocities to find the largest
@@ -51,7 +52,7 @@ public:
         }
         driveRate.divide(fastestModule);                         // limit the drive rate to keep all velocities below 1
         fieldRate.moveToward(driveRate, parameters.robotPercentChangePerCycle); // accelerate toward the drive rate target
-        robotRate = fieldRate.getRotatedCCW(fieldAngle.value);    // robot orient the drive rate
+        robotRate = fieldRate.getRotatedCW(-fieldAngle.value);    // robot orient the drive rate
 
         // averagePositionChange = Vector{}; // reset the average to zero before averaging again
         for (int i = 0; i < 4; i++)       // loop through the module indexes again
@@ -62,6 +63,15 @@ public:
         // averagePositionChange.divide(4); // find the average position change
         // averagePositionChange.scale(parameters.driveMotorRotationsToInches); // find the average and convert to inches
         // fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
+    }
+    
+    Pose getFieldRate(double angle) {
+        Vector driveRate;
+        double rotationRate = navx.GetRawGyroZ()/parameters.swerveMaxRotationRate;
+        for (int i = 0; i < 4; i++) {
+            driveRate.add(modules[i].getFieldVelocity(angle));
+        }
+        return Pose{driveRate, rotationRate};
     }
 
     void initialize()

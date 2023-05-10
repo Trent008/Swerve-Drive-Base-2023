@@ -23,27 +23,36 @@ public:
     }
 
     // add another vector to this vector and return the result
-    Vector add(Vector const &obj)
+    void add(Vector const &obj)
     {
         x += obj.x;
         y += obj.y;
-        return *this;
     }
 
-    // subtract another vector from this vector and return the result
-    Vector subtract(Vector const &obj)
+    Vector getAdded(Vector const &obj)
+    {
+        
+        return Vector{x + obj.x, y + obj.y};
+    }
+
+    // subtract another vector from this vector
+    void subtract(Vector const &obj)
     {
         x -= obj.x;
         y -= obj.y;
-        return *this;
+    }
+
+    Vector getDifference(Vector const &obj)
+    {
+        
+        return Vector{x - obj.x, y - obj.y};
     }
 
     // return this vector after scaling by the given constant
-    Vector scale(double const &k)
+    void scale(double const &k)
     {
         x *= k;
         y *= k;
-        return *this;
     }
 
     Vector getScaled(double const &k)
@@ -52,11 +61,15 @@ public:
     }
 
     // return this vector after dividing by the given constant
-    Vector divide(double const &k)
+    void divide(double const &k)
     {
         x /= k;
         y /= k;
-        return *this;
+    }
+
+    Vector getDivided(double const &k)
+    {
+        return Vector{x/k, y/k};
     }
 
     // return this vector's angle (-180 to 180 degrees)
@@ -77,11 +90,11 @@ public:
         target.subtract(*this);
         if (target.getMagnitude() > 2 * increment)
         {
-            this->add(target.divide(target.getMagnitude()).scale(increment));
+            this->add(target.getDivided(target.getMagnitude()).getScaled(increment));
         }
         else// if (target.getMagnitude() > .005)
         {
-            this->add(target.divide(2.0));
+            this->add(target.getDivided(2.0));
         }
     }
 
@@ -93,18 +106,10 @@ public:
         return *this;
     }
 
-    // rotate this vector counter-clockwise by the given angle
-    Vector rotateCCW(double angle)
+    Vector getRotatedCW(double angle)
     {
         angle *= M_PI / 180;
-        *this = Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
-        return *this;
-    }
-
-    Vector getRotatedCCW(double angle)
-    {
-        angle *= M_PI / 180;
-        return Vector{x * cos(angle) - y * sin(angle), y * cos(angle) + x * sin(angle)};
+        return Vector{x * cos(angle) + y * sin(angle), y * cos(angle) - x * sin(angle)};
     }
 };
 

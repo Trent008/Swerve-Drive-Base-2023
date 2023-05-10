@@ -11,10 +11,9 @@ class SwerveModule
 private:
     Vector turnVector;         // vector corresponding to the way the rotation rate adds to the swerve module velocity
     Vector moduleVelocity;     // stores this modules velocity vector
-    Vector driveRate;
-    Angle steeringRate;
     Angle error;
     double wheelAngle;
+    double wheelWeightedVelocity;
     double lastPosition = 0;
     double currentPosition;
     hardware::TalonFX *driveMotor;
@@ -55,22 +54,14 @@ public:
         driveMotor->SetRotorPosition(0_tr);
 
         steeringMotor->SetInverted(true);
-        //steeringPID->SetP(0.1);
-        //steeringPID->SetI(1e-4);
-        //steeringPID->SetD(1);
-        //steeringPID->SetOutputRange(-1, 1);
-        //steeringPID->SetPositionPIDWrappingEnabled(true);
-        //steeringPID->SetPositionPIDWrappingMinInput(-180);
-        //steeringPID->SetPositionPIDWrappingMaxInput(180);
-        //steeringEncoder->SetPositionConversionFactor(360/12.8);
-        //steeringEncoder->SetPosition(wheelEncoder->GetAbsolutePosition());
     }
+
+
 
     Vector getModuleVector(Pose robotRate)
     {
-        driveRate = robotRate.vector;
-        steeringRate = robotRate.angle;
-        return driveRate.add(turnVector.getScaled(steeringRate.value));
+
+        return robotRate.vector.getAdded(turnVector.getScaled(robotRate.angle.value));
     }
 
     void Set(Pose robotRate)
@@ -101,9 +92,14 @@ public:
         return wheelPositionChange;
     }
 
-    Vector getWheelVelocity() {
-        Vector res{0, driveMotor->GetVelocity().GetValue().value()};
-        res.rotateCW(wheelAngle);
+    Vector getFieldVelocity(double const &angle) {
+        Vector res{0, driveMotor->GetVelocity().GetValue().value() / 4 / parameters.falconMaxRotationsPerSecond};
+        res.rotateCW(wheelAngle + angle);
         return res;
+    }
+
+    Vector getWheelSpeed()
+    {
+        return std::abs(wheelWeightedVelocity);
     }
 };
