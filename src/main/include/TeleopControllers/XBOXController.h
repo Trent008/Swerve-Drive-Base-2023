@@ -6,12 +6,20 @@ class XBOXController
 {
 private:
     frc::Joystick *joy;
-    double nominalSpeed = 0.15;
-    double nominalRotationRate = 0.1;
+    double nominalSpeed = 0.5;
+    double nominalRotationRate = 0.3;
     double speed = 0.8;
     double rotationSpeed = 0.4;
     double deadband = 0.03;
     double a;
+
+    void applyDeadband()
+    {
+        if (std::abs(a) < deadband)
+        {
+            a = 0;
+        }
+    }
 
 public:
     XBOXController(frc::Joystick *joy)
@@ -32,47 +40,14 @@ public:
     double getLX()
     {
         a = getSpeed() * joy->GetRawAxis(0);
-        if (!std::signbit(a))
-        {
-            a -= deadband;
-            if (std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        else if (std::signbit(a))
-        {
-            a += deadband;
-            if (!std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        a *= 1 / (1 - deadband);
-
+        applyDeadband();
         return a;
     }
 
     double getLY()
     {
         a = getSpeed() * -joy->GetRawAxis(1);
-        if (!std::signbit(a))
-        {
-            a -= deadband;
-            if (std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        else if (std::signbit(a))
-        {
-            a += deadband;
-            if (!std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        a *= 1 / (1 - deadband);
+        applyDeadband();
         return a;
     }
 
@@ -80,46 +55,14 @@ public:
     double getRX()
     {
         a = getRotationSpeed() * joy->GetRawAxis(4);
-        if (!std::signbit(a))
-        {
-            a -= deadband;
-            if (std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        else if (std::signbit(a))
-        {
-            a += deadband;
-            if (!std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        a *= 1 / (1 - deadband);
+        applyDeadband();
         return a;
     }
 
     double getRY()
     {
         a = getSpeed() * -joy->GetRawAxis(5);
-        if (!std::signbit(a))
-        {
-            a -= deadband;
-            if (std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        else if (std::signbit(a))
-        {
-            a += deadband;
-            if (!std::signbit(a))
-            {
-                a = 0;
-            }
-        }
-        a *= 1 / (1 - deadband);
+        applyDeadband();
         return a;
     }
 

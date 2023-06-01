@@ -22,7 +22,7 @@ public:
         swerveRate = poseError;
         swerveRate.scale(positionProportional, angleProportional);
         swerveRate.limit(setpoint.maxDriveRate, setpoint.maxRotationRate);
-        swerve.Set(swerveRate);
+        swerve.Set(swerveRate, true);
     }
 
     bool poseReached(double positionTolerance, double angleTolerance)

@@ -2,7 +2,7 @@
 #include "Robot.h"
 
 void Robot::RobotInit()
-{}
+{swerve.initialize();}
 
 void Robot::RobotPeriodic(){}
 
@@ -11,16 +11,16 @@ void Robot::AutonomousInit(){}
 void Robot::AutonomousPeriodic()
 {
   // move the swerve drive twards the next setpoint
-  //swerveController.setReferencePose(setpoints[i].swerveSetpoint);
+  swerveController.setReferencePose(setpoints[i].swerveSetpoint);
   // go to next setpoint if this setpoint has been reached
-  //if (swerveController.poseReached(3, 5) && (i < 14))
-  //{
-  //  i++;
-  //}
+  if (swerveController.poseReached(3, 5) && (i < 14))
+  {
+   i++;
+  }
 }
 
 void Robot::TeleopInit()
-{swerve.initialize();}
+{}
 
 void Robot::TeleopPeriodic()
 {

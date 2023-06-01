@@ -13,7 +13,6 @@ private:
     Vector moduleVelocity;     // stores this modules velocity vector
     Angle error;
     double wheelAngle;
-    double wheelWeightedVelocity;
     double lastPosition = 0;
     double currentPosition;
     hardware::TalonFX *driveMotor;
@@ -90,16 +89,5 @@ public:
     Vector getwheelPositionChange()
     {
         return wheelPositionChange;
-    }
-
-    Vector getFieldVelocity(double const &angle) {
-        Vector res{0, driveMotor->GetVelocity().GetValue().value() / 4 / parameters.falconMaxRotationsPerSecond};
-        res.rotateCW(wheelAngle + angle);
-        return res;
-    }
-
-    Vector getWheelSpeed()
-    {
-        return std::abs(wheelWeightedVelocity);
     }
 };

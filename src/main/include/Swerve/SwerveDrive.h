@@ -34,10 +34,13 @@ public:
     /**
      * runs the swerve modules using the values from the motion controller
      **/
-    void Set(Pose driveRate)
+    void Set(Pose driveRate, bool isAutonomous = false, bool isRobotOriented = false)
     {
         navXAngle = Angle{navx.GetYaw()};
         fieldAngle = navXAngle.getAdded(parameters.startingAngle);
+        if (isRobotOriented) {
+            driveRate = driveRate.getRotatedCW(fieldAngle.value);
+        }
 
         robotRate = driveRate.getRotatedCW(-fieldAngle.value); // robot orient the drive rate
 
@@ -51,27 +54,25 @@ public:
             }
         }
         driveRate.divide(fastestModule);                         // limit the drive rate to keep all velocities below 1
-        fieldRate.moveToward(driveRate, parameters.robotPercentChangePerCycle); // accelerate toward the drive rate target
+        if (!isAutonomous)
+        {
+            fieldRate.moveToward(driveRate, parameters.robotPercentChangePerCycle); // accelerate toward the drive rate target
+        }
+        else
+        {
+            fieldRate = driveRate;
+        }
         robotRate = fieldRate.getRotatedCW(-fieldAngle.value);    // robot orient the drive rate
 
-        // averagePositionChange = Vector{}; // reset the average to zero before averaging again
+        averagePositionChange = Vector{}; // reset the average to zero before averaging again
         for (int i = 0; i < 4; i++)       // loop through the module indexes again
         {
             modules[i].Set(robotRate);                                                            // set each module using the accelerated robot rate
-            // averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
+            averagePositionChange.add(modules[i].getwheelPositionChange().rotateCW(fieldAngle.value)); // add the wheel velocity to the total sum
         }
-        // averagePositionChange.divide(4); // find the average position change
-        // averagePositionChange.scale(parameters.driveMotorRotationsToInches); // find the average and convert to inches
-        // fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
-    }
-    
-    Pose getFieldRate(double angle) {
-        Vector driveRate;
-        double rotationRate = navx.GetRawGyroZ()/parameters.swerveMaxRotationRate;
-        for (int i = 0; i < 4; i++) {
-            driveRate.add(modules[i].getFieldVelocity(angle));
-        }
-        return Pose{driveRate, rotationRate};
+        averagePositionChange.divide(4); // find the average position change
+        averagePositionChange.scale(parameters.driveMotorInchesPerRotation); // find the average and convert to inches
+        fieldDisplacement.add(averagePositionChange); // adds the distance traveled this cycle to the total distance to find the position
     }
 
     void initialize()

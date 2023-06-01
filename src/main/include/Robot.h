@@ -14,9 +14,9 @@ public:
 
   AutonomousSetpoint setpoints[15] =
         {
-            {},
-            {},
-            {},
+            {SwervePreset{Pose{{0, 0},0}, 0.3}},
+            {SwervePreset{Pose{{0, 20},0}, 0.3}},
+            {SwervePreset{Pose{{0, 0},0}, 0.3}},
             {},
             {},
             {},
@@ -33,7 +33,7 @@ public:
   XBOXController xboxC{new frc::Joystick{0}};
 
   // swerve drive object to control the 4-SwerveModule array
-  //SwervePoseController swerveController{&swerve};
+  SwervePoseController swerveController;
 
   
   void RobotInit() override;

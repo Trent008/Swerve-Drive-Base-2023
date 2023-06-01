@@ -5,8 +5,8 @@
 // parameters for robot movement and autonomous
 struct Parameters
 {  
-    double const robotAccelMetersPerSecondSquared = 8; // acceleration rate of the robot pose on the field
-    double const ampsForRobotAccel = 40;
+    double const robotAccelMetersPerSecondSquared = 10; // acceleration rate of the robot pose on the field
+    double const ampsForRobotAccel = 50;
     double const wheelDiameter = 3.9;
     double const driveMotorInchesPerRotation = (M_PI * wheelDiameter / 6.75);
     double const falconMaxRotationsPerSecond = 101;
