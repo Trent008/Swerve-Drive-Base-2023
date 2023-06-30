@@ -19,7 +19,7 @@ private:
     Vector fieldDisplacement;
     Vector averageModuleChange;
     Vector currentFieldRate;
-    float currentAngularRate;
+    float currentAngularRate = 0;
     float fieldAngle;
     float fastestModule;
     float moduleWheelSpeed;
@@ -39,8 +39,8 @@ public:
         fieldAngle = angleSum(navx.GetYaw(), parameters.startingAngle);
         fieldRateTarget.rotateCW(-fieldAngle); // field orient the drive command
         normalizeSwerveRate(fieldRateTarget, angularRateTarget); // keeps the module speeds in range
-        averageModuleChange = {0, 0};
-        currentFieldRate = {0, 0};
+        averageModuleChange = Vector{0, 0};
+        currentFieldRate = Vector{0, 0};
         currentAngularRate = 0;
         for (int i = 0; i < 4; i++) // do some stuff for all four modules
         {
